@@ -2,8 +2,8 @@
 //
 // POST
 
-const BASE_URL = 'https://pokeapi.co/api/v2/';
-  
+const BASE_URL = 'https://pokeapi.co/api/v2/'; //URL
+   
 // Fetch no async
 /*
 fetch(BASE_URL + 'pokemon/ditto')
@@ -20,16 +20,47 @@ const fetchPokemon = async (pokemon) => {
     } catch (err) {
         console.error(err);
     }
-}
+};
+
+//se crea la card 
+const createPokemonCard = (pokemon) => {
+    const card = document.createElement("div");
+    card.className = "pokemon-card"; // nombre de la clase
+    const abilities = pokemon.abilities.map(abilityInfo => abilityInfo.ability.name).join(', ');
+    
+    card.innerHTML = `
+        <h2>${pokemon.name}</h2>
+        <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
+        <p>Tipo: ${pokemon.types.map(typeInfo => typeInfo.type.name).join(', ')}</p>
+        <p>Peso: ${pokemon.weight / 10} kg</p>
+        <p>Altura: ${pokemon.height / 10} m</p>
+        <p>Habilidades: ${abilities}</p> 
+
+    `;
+
+    return card;
+};
+
+//se muestra la carta
+const displayPokemonCard = (pokemon) => {
+    const container = document.getElementById("pokemon-container");
+    container.innerHTML = ''; // Clear previous card
+    const card = createPokemonCard(pokemon);
+    container.appendChild(card);
+};
+
 
 // Obtener pokemon
 document.getElementById('get-btn')
     .addEventListener('click', async () => {
         const text = document.getElementById('poke-name').value.toLowerCase();
         const pokemon = await fetchPokemon(text);
-        localStorage.setItem('currentPokeId', pokemon.id); //guarda el id en el local storage
-        console.log(pokemon.name);
-    })
+        if (pokemon) {
+            localStorage.setItem("currentPokemon", JSON.stringify(pokemon));
+            localStorage.setItem("currentPokemonId", pokemon.id);
+            displayPokemonCard(pokemon);
+        }; 
+    });
 
 document.addEventListener('DOMContentLoaded', async () => {
     const storedId = localStorage.getItem('currentPokeId');
@@ -44,8 +75,13 @@ document.getElementById('previous-btn')
         const currentPokeId = parseInt(localStorage.getItem('currentPokeId'));
         const newId = Math.max(1, currentPokeId -1);
         const pokemon = await fetchPokemon(newId);
+        if (pokemon) {
+            localStorage.setItem("currentPokemon", JSON.stringify(pokemon));
+            localStorage.setItem("currentPokemonId", pokemon.id);
+            displayPokemonCard(pokemon);
+        }
         console.log(pokemon.name);
-    })
+    });
 
 // obtener el siguiente
 
@@ -54,6 +90,12 @@ document.getElementById('next-btn')
         const currentPokeId = parseInt(localStorage.getItem('currentPokeId'));
         const newId = currentPokeId + 1;
         const pokemon = await fetchPokemon(newId);
+        if (pokemon) {
+            localStorage.setItem("currentPokemon", JSON.stringify(pokemon));
+            localStorage.setItem("currentPokemonId", pokemon.id);
+            displayPokemonCard(pokemon);
+        }
+
         console.log(pokemon.name);
     })
 
@@ -62,6 +104,7 @@ document.getElementById('next-btn')
 ////////////////// POST
 //
 
+/*
 fetch('https://jsonplaceholder.typicode.com/posts', {
     method: 'POST',
     body: JSON.stringify({
@@ -75,6 +118,8 @@ fetch('https://jsonplaceholder.typicode.com/posts', {
 }).then(res => res.json())
     .then(json => console.log(json));
 
+*/
+
 
 
 
@@ -83,31 +128,6 @@ fetch('https://jsonplaceholder.typicode.com/posts', {
         //Quiero pensar que habla de poner toa la info en el Local
 
 // - Manipular el DOM y agregar una tarjeta del pokemon.
-
-// Crear el contenedor de la tarjeta
-const card = document.createElement('div');
-card.className = 'card';
-
-// Crear y agregar una imagen a la tarjeta
-const img = document.createElement('img');
-img.src = 'https://via.placeholder.com/300'; // URL de una imagen de ejemplo
-img.alt = 'Imagen de ejemplo';
-card.appendChild(img);
-
-// Crear y agregar un título a la tarjeta
-const title = document.createElement('h2');
-title.textContent = 'Título de la Tarjeta';
-card.appendChild(title);
-
-// Crear y agregar un párrafo de texto a la tarjeta
-const paragraph = document.createElement('p');
-paragraph.textContent = 'Este es un texto de ejemplo para la tarjeta.';
-card.appendChild(paragraph);
-
-// Agregar la tarjeta al cuerpo del documento
-document.body.appendChild(card);
-
-
-// - El tamaño e info de la tarjeta es a consideración personal.
+// - El tamaño e info de la tarjeta es a consideración personal.  Al menos mostrar el nombre, id y peso del pokemon. Puntos extra si se muestra una imagen.
 // - La tarjeta debe mantenerse en la pantalla.
 // - La info -> LocalStorage -> Fetch
